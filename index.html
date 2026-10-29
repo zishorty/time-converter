@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16324f">
+<title>Time Converter</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f3efe6;--card:#fffdf8;--ink:#16324f;--mute:#5d6f82;--line:#d9d2c0;--accent:#e8a317;--accent-ink:#16324f}
+@media (prefers-color-scheme:dark){:root{--bg:#0f2236;--card:#16324f;--ink:#f5efe0;--mute:#9db0c4;--line:#2c4a69;--accent:#f0b429;--accent-ink:#0f2236}}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;padding:max(20px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));max-width:480px;margin:0 auto}
+h1{font-size:1.6rem;margin:8px 0 20px;letter-spacing:-.01em}
+section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
+h2{font-size:1.05rem;margin:0 0 14px}
+.row{display:flex;gap:10px}
+.field{flex:1}
+label{display:block;font-size:.85rem;color:var(--mute);margin-bottom:6px}
+input{width:100%;font:inherit;font-size:1.4rem;padding:12px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--ink)}
+input:focus{outline:none;border-color:var(--accent)}
+.out{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);min-height:84px}
+.big{font-size:2.3rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.big span{font-size:1rem;font-weight:400;color:var(--mute);margin:0 8px 0 3px}
+.sub{color:var(--mute);margin-top:6px;font-size:.95rem}
+button{font:inherit;margin-top:12px;padding:8px 14px;border-radius:999px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<h1>Time Converter</h1>
+
+<section>
+  <h2>Minutes to hours and minutes</h2>
+  <label for="m">Minutes</label>
+  <input id="m" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 135">
+  <div class="out" aria-live="polite" id="o1"><div class="sub">Enter minutes to convert.</div></div>
+</section>
+
+<section>
+  <h2>Hours and minutes to minutes</h2>
+  <div class="row">
+    <div class="field"><label for="h">Hours</label><input id="h" type="number" inputmode="decimal" min="0" step="any" placeholder="2"></div>
+    <div class="field"><label for="mm">Minutes</label><input id="mm" type="number" inputmode="decimal" min="0" step="any" placeholder="15"></div>
+  </div>
+  <div class="out" aria-live="polite" id="o2"><div class="sub">Enter hours and/or minutes.</div></div>
+</section>
+
+<script>
+const $=id=>document.getElementById(id);
+const n=v=>{const x=parseFloat(v);return isFinite(x)&&x>=0?x:null};
+const fmt=x=>Number.isInteger(x)?String(x):String(+x.toFixed(2));
+const pl=(x,w)=>x===1?w:w+"s";
+function c1(){
+  const t=n($("m").value),o=$("o1");
+  if(t===null){o.innerHTML='<div class="sub">Enter minutes to convert.</div>';return}
+  const total=Math.round(t),h=Math.floor(total/60),r=total%60;
+  o.innerHTML=`<div class="big">${h}<span>${pl(h,"hr")}</span>${r}<span>${pl(r,"min")}</span></div><div class="sub">${fmt(t/60)} hours in decimal</div>`;
+}
+function c2(){
+  const h=n($("h").value),m=n($("mm").value),o=$("o2");
+  if(h===null&&m===null){o.innerHTML='<div class="sub">Enter hours and/or minutes.</div>';return}
+  const t=(h||0)*60+(m||0);
+  o.innerHTML=`<div class="big">${fmt(t)}<span>${pl(t,"min")}</span></div><div class="sub">${fmt(t/60)} hours in decimal</div>`;
+}
+$("m").addEventListener("input",c1);
+$("h").addEventListener("input",c2);
+$("mm").addEventListener("input",c2);
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
